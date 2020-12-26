@@ -1,0 +1,69 @@
+ffmpeg -f concat  -i input0.txt -i 11-joy-to-the-world-with-Guitar.m4a -c:a copy -vsync vfr -pix_fmt yuv420p video-base-0.mp4
+
+ffmpeg -y -i 11-2.m4a -i 11-3.m4a -filter_complex "[0:0]volume=0.9[a];[1:0]volume=0.9[b];[a][b]amix=inputs=2:duration=longest" -c:a libmp3lame -qscale:a 0 output-2.mp3
+
+ffmpeg -y -i example1-trim.m4a -i 11-2.m4a -filter_complex "[0:0]volume=1.0[a];[1:0]volume=0.9[b];[a][b]amix=inputs=2:duration=longest" -c:a libmp3lame -qscale:a 0 example1-merged.mp3
+
+ffmpeg -i example1.m4a -ss 00:00:03.500 -c copy example1-trim.m4a
+
+ffmpeg -y -i official-background.mp3 -i vitamin-guitar.m4a -filter_complex "[0]volume=1.0[a];[1]volume=0.5,adelay=5200|5200[b];[a][b]amix=inputs=2:duration=longest" -c:a libmp3lame -qscale:a 0 11-joy-to-the-world-with-Guitar.mp3
+
+ffmpeg  -i 11-joy-to-the-world-with-Guitar.mp3 -c:a aac -b:a 160k 11-joy-to-the-world.m4a
+
+ffmpeg -f concat  -i input0.txt -i 11-joy-to-the-world-with-Guitar.m4a -c:a copy -vcodec libx264 -crf 25 -s 1920x1080 -pix_fmt yuv420p video-base-0.mp4
+
+ffmpeg -y -i 11-joy-to-the-world-with-Guitar.mp3 -i andy-cicely-1.m4a -filter_complex "[0]volume=1.0[a];[1]volume=0.8,adelay=5500|5500[b];[a][b]amix=inputs=2:duration=longest" -c:a libmp3lame -qscale:a 0 andy-cicely-composed.mp3
+
+ffmpeg -y -i 11-joy-to-the-world-with-Guitar.mp3 -i andy-cicely-trimmed.m4a -filter_complex "[0]volume=1.4[a];[1]volume=0.8,adelay=6200|6200[b];[a][b]amix=inputs=2:duration=longest" -c:a libmp3lame -qscale:a 0 andy-cicely-composed-2.mp3
+
+ffmpeg -y -i 11-joy-to-the-world-with-Guitar.mp3 -i ChenFamilyFinal.m4a -filter_complex "[0]volume=1.4[a];[1]volume=0.8,adelay=6150|6150[b];[a][b]amix=inputs=2:duration=longest" -c:a libmp3lame -qscale:a 0 ChenFamilyComposed6.mp3
+
+# Trim video 
+ffmpeg -ss 00:00:19 -i MAH00538.mp4 -to 00:02:10 -c copy ChenFamilyVideo.mp4 
+
+# Remove audio
+ffmpeg -i ChenFamilyVideo.mp4 -c copy -an ChenFamilyVideo2.mp4
+
+# Add audio
+ffmpeg -i ChenFamilyVideo2.mp4 -i ChenFamilyFinal.m4a -map 0 -map 1:a -c:v copy -shortest output.mp4
+
+ffmpeg -i ChenFamily-offset-6.15s.mp4 -vf scale=-1:360 -c:v libx264 -crf 18 -preset veryslow -c:a copy sample.mp4
+ffmpeg -i ChenFamily-offset-6.15s.mp4 -filter:v scale=320:-1 -c:a copy sample.mp4
+
+ffmpeg -i video-base-0.mp4 -vf "movie=sample.mp4[inner];[in][inner]overlay=10:520[out]" output.mp4
+
+ffmpeg -i ChenFamily-offset-6.15s.mp4 -filter:v scale=360:-1 -c:a copy chen.mp4
+ffmpeg -i video-base-0.mp4 -i chen.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+6.15/TB,fade=in:st=0:d=5:alpha=1[top];[top]scale=360x202[top1];[0:0][top1]overlay=20:520[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+ffmpeg -i output.mp4 -i kuo.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+6.15/TB[top];[top]scale=360x202[top1];[0:0][top1]overlay=400:520[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output1.mp4
+ffmpeg -i output1.mp4 -i li.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+6.15/TB[top];[top]scale=360x202[top1];[0:0][top1]overlay=780:520[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output2.mp4
+ffmpeg -i output2.mp4 -i yang0.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+6.15/TB[top];[top]scale=360x202[top1];[0:0][top1]overlay=1160:520[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output3.mp4
+ffmpeg -i output3.mp4 -i yuen.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+6.15/TB[top];[top]scale=360x202[top1];[0:0][top1]overlay=1540:520[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output4.mp4
+
+ffmpeg -i ../../video-base-0.mp4 -i kuo.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+5.35/TB,scale=360x202[top];[0:0][top]overlay=220:540[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+
+ffmpeg -i norman.mp4 -ss 00:00:07.500 -to 00:02:01 -c:v libx264 -crf 18 -an  output.mp4
+
+ffmpeg -i video.mp4 -i genaudio.mp3 -map 0:v -map 1:a -c:v copy -c:a copy output.mp4 -y
+
+cd kuo
+ffmpeg -i ../base.mp4 -i kuo.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+5.35/TB,scale=360x202[top];[0:0][top]overlay=220:540[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+cd ../lam
+ffmpeg -i ../kuo/output.mp4 -i lam.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+5.45/TB,scale=360x202[top];[0:0][top]overlay=600:540[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+cd ../li
+ffmpeg -i ../lam/output.mp4 -i li.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+5.55/TB,scale=360x202[top];[0:0][top]overlay=980:540[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+cd ../lu
+ffmpeg -i ../li/output.mp4 -i lu.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+5.65/TB,scale=360x202[top];[0:0][top]overlay=1360:540[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+cd ../wang
+ffmpeg -i ../lu/output.mp4 -i wang.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+5.75/TB,scale=360x202[top];[0:0][top]overlay=20:762[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+cd ../yangf
+ffmpeg -i ../wang/output.mp4 -i yangf.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+5.85/TB,scale=360x202[top];[0:0][top]overlay=400:762[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+cd ../yangy
+ffmpeg -i ../yangf/output.mp4 -i yangy.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+5.95/TB,scale=360x202[top];[0:0][top]overlay=780:762[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+cd ../yuen
+ffmpeg -i ../yangy/output.mp4 -i yuen.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+6.05/TB,scale=360x202[top];[0:0][top]overlay=1160:762[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+cd ../chen
+ffmpeg -i ../yuen/output.mp4 -i chen.mp4  -filter_complex "[1]setpts=PTS-STARTPTS+6.15/TB,scale=360x202[top];[0:0][top]overlay=1540:762[out]" -map "[out]" -map 0:1 -pix_fmt yuv420p -c:a copy -c:v libx264 -crf 18  output.mp4
+ffmpeg  -i ../../sound/final.mp3 -c:a aac -b:a 160k vitaminj.m4a
+ffmpeg -i video.mp4 -i vitaminj.m4a -map 0:v -map 1:a -c:v copy -c:a copy vitaminj.mp4 -y
+
+ffmpeg -y -i base.mp3 -i chen/chen.m4a -i kuo/kuo.m4a -i lam/lam.m4a -i li/output1.m4a -i lu/output.m4a -i wang/output.m4a -i yangf/output.m4a -i yuen/output.m4a -i wang/royee-ethan.m4a -i wang/royee.m4a -i yangy/output.m4a -filter_complex "[0]volume=8.0[a];[1]volume=1,adelay=6150|6150[b];[2]volume=0.6,adelay=5750|5750[c];[3]volume=1,adelay=6100|6100[d];[4]volume=0.6,adelay=6100|6100[e];[5]volume=0.8,adelay=6150|6150[f];[6]volume=1,adelay=6100|6100[g];[7]volume=0.6,adelay=
